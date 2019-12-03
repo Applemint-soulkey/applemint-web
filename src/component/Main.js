@@ -137,6 +137,9 @@ const Main = observer(() => {
                         text="Remove"
                         onClick={() => {
                           article.removeArticle(value.fb_id);
+                          if (article.articles.length < article.loadSize) {
+                            article.loadMore();
+                          }
                           toast(({ closeToast }) => (
                             <Box>
                               <Box
