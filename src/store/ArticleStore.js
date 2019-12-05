@@ -3,13 +3,14 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 
 class ArticleStore {
-  loadSize = 10;
+  loadSize = 15;
   state = "new";
   filter = "all";
   articles = [];
   last = null;
   hasMore = false;
   collectionRef = null;
+  totalSize = 0;
 
   restoreArticle = article => {
     let insertFbId = article.fb_id;
@@ -25,6 +26,7 @@ class ArticleStore {
           ...article,
           fb_id: insertFbId
         });
+        this.totalSize = this.totalSize + 1;
       });
   };
 
@@ -38,6 +40,7 @@ class ArticleStore {
         this.articles = this.articles.filter(article => {
           return article.fb_id !== fb_id;
         });
+        this.totalSize = this.totalSize - 1;
       });
   };
 
@@ -53,6 +56,7 @@ class ArticleStore {
         this.articles = this.articles.filter(article => {
           return article.fb_id !== fb_id;
         });
+        this.totalSize = this.totalSize - 1;
       });
   };
 
@@ -90,6 +94,10 @@ class ArticleStore {
         : collectionRef.orderBy("timestamp", "desc");
     this.collectionRef = filterRef;
 
+    this.collectionRef.get().then(snapshot => {
+      this.totalSize = snapshot.docs.length;
+    });
+
     this.collectionRef
       .limit(this.loadSize)
       .get()
@@ -110,7 +118,7 @@ class ArticleStore {
   loadMore = () => {
     if (this.collectionRef !== null) {
       this.collectionRef
-        .startAfter(this.last.data().timestamp)
+        .startAfter(this.last)
         .limit(this.loadSize)
         .get()
         .then(snapshot => {
@@ -141,6 +149,7 @@ decorate(ArticleStore, {
   filter: observable,
   articles: observable,
   hasMore: observable,
+  totalSize: observable,
   resetArticles: action,
   setFilter: action,
   setState: action,

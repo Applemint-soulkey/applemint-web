@@ -96,6 +96,16 @@ const Main = observer(() => {
         </Box>
       </Box>
       <Divider />
+      <Box
+        padding={3}
+        display="flex"
+        alignItems="center"
+        justifyContent="start"
+      >
+        <Text size="xl" weight="bold">
+          {"Remain Items: " + article.totalSize}
+        </Text>
+      </Box>
       <Box padding={3} display="flex" direction="column">
         <InfiniteScroll
           pageStart={0}
@@ -103,8 +113,8 @@ const Main = observer(() => {
           loadMore={() => article.loadMore()}
           hasMore={article.hasMore}
           loader={
-            <Box margin={2}>
-              <Spinner show={true} />
+            <Box key="spinner" margin={2}>
+              <Spinner show={true} accessibilityLabel="load-more" />
             </Box>
           }
         >
@@ -121,7 +131,14 @@ const Main = observer(() => {
                 <Card>
                   <Box display="flex" alignItems="end">
                     <Box flex="grow" column={10}>
-                      <Link href={value.url} target="blank">
+                      <Link
+                        href={
+                          value.url.includes("https:")
+                            ? value.url
+                            : "https://" + value.url
+                        }
+                        target="blank"
+                      >
                         <Heading size="xs">
                           {value.textContent === ""
                             ? value.host
