@@ -13,7 +13,7 @@ class AuthStore {
         console.log(error);
       })
       .then(response => {
-        console.log(response);
+        // console.log(response);
         this.isSigned = true;
       });
   };
