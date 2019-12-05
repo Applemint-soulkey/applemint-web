@@ -26,6 +26,7 @@ const Main = observer(() => {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterRef, setFilterRef] = useState(() => createRef());
+  const httpRegex = /(https?:[^\s]+)/g;
 
   useEffect(() => {
     article.firstLoad();
@@ -133,7 +134,7 @@ const Main = observer(() => {
                     <Box flex="grow" column={10}>
                       <Link
                         href={
-                          value.url.includes("https:")
+                          httpRegex.test(value.url)
                             ? value.url
                             : "https://" + value.url
                         }
