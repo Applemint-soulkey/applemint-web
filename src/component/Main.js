@@ -11,7 +11,8 @@ import {
   Label,
   Card,
   Link,
-  Spinner
+  Spinner,
+  Badge
 } from "gestalt";
 import "gestalt/dist/gestalt.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,8 +26,8 @@ const Main = observer(() => {
   const { auth, article } = useStores();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [filterRef, setFilterRef] = useState(() => createRef());
-  const httpRegex = /(https?:[^\s]+)/g;
+  const [filterRef] = useState(() => createRef());
+  const httpRegex = /(https?:[^\s]+)/;
 
   useEffect(() => {
     article.firstLoad();
@@ -55,7 +56,7 @@ const Main = observer(() => {
   };
 
   return (
-    <Box>
+    <Box display="flex" direction="column" className="fill-window">
       <Box
         display="flex"
         justifyContent="start"
@@ -107,107 +108,121 @@ const Main = observer(() => {
           {"Remain Items: " + article.totalSize}
         </Text>
       </Box>
-      <Box padding={3} display="flex" direction="column">
-        <InfiniteScroll
-          pageStart={0}
-          initialLoad={false}
-          loadMore={() => article.loadMore()}
-          hasMore={article.hasMore}
-          loader={
-            <Box key="spinner" margin={2}>
-              <Spinner show={true} accessibilityLabel="load-more" />
-            </Box>
-          }
+      {article.articles.length === 0 ? (
+        <Box
+          marginTop={12}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
         >
-          {article.articles.map((value, index) => {
-            return (
-              <Box
-                key={index}
-                marginTop={1}
-                padding={2}
-                column={12}
-                color="lightGray"
-                shape="rounded"
-              >
-                <Card>
-                  <Box display="flex" alignItems="end">
-                    <Box flex="grow" column={10}>
-                      <Link
-                        href={
-                          httpRegex.test(value.url)
-                            ? value.url
-                            : "https://" + value.url
-                        }
-                        target="blank"
-                      >
-                        <Heading size="xs">
-                          {value.textContent === ""
-                            ? value.host
-                            : value.textContent}
-                        </Heading>
-                        <Text>{value.url}</Text>
-                      </Link>
-                    </Box>
-                    <Box margin={1}>
-                      <Button
-                        color="red"
-                        size="sm"
-                        text="Remove"
-                        onClick={() => {
-                          article.removeArticle(value.fb_id);
-                          if (article.articles.length < article.loadSize) {
-                            article.loadMore();
+          <Heading>No Contents</Heading>
+        </Box>
+      ) : (
+        <Box padding={3} display="flex" direction="column">
+          <InfiniteScroll
+            pageStart={0}
+            initialLoad={false}
+            loadMore={() => article.loadMore()}
+            hasMore={article.hasMore}
+            loader={
+              <Box key="spinner" margin={2}>
+                <Spinner show={true} accessibilityLabel="load-more" />
+              </Box>
+            }
+          >
+            {article.articles.map((value, index) => {
+              return (
+                <Box
+                  key={index}
+                  marginTop={1}
+                  padding={2}
+                  column={12}
+                  color="lightGray"
+                  shape="rounded"
+                >
+                  <Card>
+                    <Box display="flex" alignItems="end">
+                      <Box flex="grow" column={10}>
+                        <Link
+                          href={
+                            httpRegex.test(value.url)
+                              ? value.url
+                              : "https://" + value.url
                           }
-                          toast(({ closeToast }) => (
-                            <Box>
-                              <Box
-                                padding={1}
-                                display="flex"
-                                justifyContent="center"
-                                direction="column"
-                                marginBottom={3}
-                              >
-                                <Text size="lg" weight="bold">
-                                  {"'" +
-                                    (value.textContent === ""
-                                      ? value.host
-                                      : value.textContent) +
-                                    "' is Deleted"}
-                                </Text>
-                              </Box>
-                              <Button
-                                size="sm"
-                                color="red"
-                                text="UNDO"
-                                onClick={() => {
-                                  article.restoreArticle(value);
-                                  closeToast();
-                                }}
-                              />
-                            </Box>
-                          ));
-                        }}
-                      />
-                    </Box>
-                    {activeTabIndex === 0 ? (
+                          target="blank"
+                        >
+                          <Badge text={value.type} />
+
+                          <Heading size="xs">
+                            {value.textContent === ""
+                              ? value.host
+                              : value.textContent}
+                          </Heading>
+                          <Text>{value.url}</Text>
+                        </Link>
+                      </Box>
                       <Box margin={1}>
                         <Button
-                          color="blue"
+                          color="red"
                           size="sm"
-                          text="Keep"
-                          onClick={() => article.keepArticle(value.fb_id)}
+                          text="Remove"
+                          onClick={() => {
+                            article.removeArticle(value.fb_id);
+                            if (article.articles.length < article.loadSize) {
+                              article.loadMore();
+                            }
+                            toast(({ closeToast }) => (
+                              <Box>
+                                <Box
+                                  padding={1}
+                                  display="flex"
+                                  justifyContent="center"
+                                  direction="column"
+                                  marginBottom={3}
+                                >
+                                  <Text size="lg" weight="bold">
+                                    {"'" +
+                                      (value.textContent === ""
+                                        ? value.host
+                                        : value.textContent) +
+                                      "' is Deleted"}
+                                  </Text>
+                                </Box>
+                                <Button
+                                  size="sm"
+                                  color="red"
+                                  text="UNDO"
+                                  onClick={() => {
+                                    article.restoreArticle(value);
+                                    closeToast();
+                                  }}
+                                />
+                              </Box>
+                            ));
+                          }}
                         />
                       </Box>
-                    ) : (
-                      <Box />
-                    )}
-                  </Box>
-                </Card>
-              </Box>
-            );
-          })}
-        </InfiniteScroll>
-      </Box>
+                      {activeTabIndex === 0 ? (
+                        <Box margin={1}>
+                          <Button
+                            color="blue"
+                            size="sm"
+                            text="Keep"
+                            onClick={() => article.keepArticle(value.fb_id)}
+                          />
+                        </Box>
+                      ) : (
+                        <Box />
+                      )}
+                    </Box>
+                  </Card>
+                </Box>
+              );
+            })}
+          </InfiniteScroll>
+        </Box>
+      )}
+
       {filterOpen && (
         <Flyout
           anchor={filterRef.current}
