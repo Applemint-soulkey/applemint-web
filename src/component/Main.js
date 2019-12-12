@@ -21,11 +21,12 @@ import { typeList } from "../config/TypeList";
 import { observer } from "mobx-react-lite";
 import useStores from "../store/Common";
 
+const httpRegex = /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)/;
 const Main = observer(() => {
   const { auth, article } = useStores();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [filterRef, setFilterRef] = useState(() => createRef());
+  const [filterRef] = useState(() => createRef());
 
   useEffect(() => {
     article.firstLoad();
@@ -133,7 +134,7 @@ const Main = observer(() => {
                     <Box flex="grow" column={10}>
                       <Link
                         href={
-                          value.url.includes("https:")
+                          httpRegex.test(value.url)
                             ? value.url
                             : "https://" + value.url
                         }
@@ -187,6 +188,9 @@ const Main = observer(() => {
                           ));
                         }}
                       />
+                    </Box>
+                    <Box margin={1}>
+                      <Button color="white" size="sm" text="Analyze" />
                     </Box>
                     {activeTabIndex === 0 ? (
                       <Box margin={1}>
