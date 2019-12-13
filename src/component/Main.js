@@ -6,9 +6,6 @@ import {
   Divider,
   Text,
   Button,
-  Flyout,
-  RadioButton,
-  Label,
   Card,
   Link,
   Spinner,
@@ -18,25 +15,45 @@ import "gestalt/dist/gestalt.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import InfiniteScroll from "react-infinite-scroller";
-import { typeList } from "../config/TypeList";
+import AnalyzeModal from "./Analyze";
+import Filter from "./Filter";
 import { observer } from "mobx-react-lite";
 import useStores from "../store/Common";
+
+import firebase from "firebase/app";
+import "firebase/functions";
 
 const Main = observer(() => {
   const { auth, article } = useStores();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterRef] = useState(() => createRef());
+  const [analyzeOpen, setAnalyzeOpen] = useState(false);
+  const [analyzeResult, setAnalyzeResult] = useState();
   const httpRegex = /(https?:[^\s]+)/;
 
   useEffect(() => {
     article.firstLoad();
   }, []);
 
-  const _handleFilterClick = event => {
+  const _toggleAnalyze = async fb_id => {
+    if (analyzeOpen === false) {
+      //open
+      var analyzeCall = firebase.functions().httpsCallable("analyze");
+      analyzeCall({ id: fb_id }).then(result => {
+        setAnalyzeResult(result.data);
+        console.log(result.data);
+      });
+    } else {
+      setAnalyzeResult(undefined);
+    }
+    setAnalyzeOpen(!analyzeOpen);
+  };
+
+  const _handleFilterClick = () => {
     setFilterOpen(!filterOpen);
   };
-  const _handleDismiss = event => {
+  const _handleDismiss = () => {
     setFilterOpen(false);
   };
 
@@ -202,6 +219,14 @@ const Main = observer(() => {
                           }}
                         />
                       </Box>
+                      <Box margin={1}>
+                        <Button
+                          color="white"
+                          size="sm"
+                          text="Analyze"
+                          onClick={() => _toggleAnalyze(value.fb_id)}
+                        />
+                      </Box>
                       {activeTabIndex === 0 ? (
                         <Box margin={1}>
                           <Button
@@ -222,48 +247,9 @@ const Main = observer(() => {
           </InfiniteScroll>
         </Box>
       )}
+      {filterOpen && Filter(filterRef.current, _handleDismiss, article)}
+      {analyzeOpen && AnalyzeModal(analyzeResult, _toggleAnalyze)}
 
-      {filterOpen && (
-        <Flyout
-          anchor={filterRef.current}
-          idealDirection="down"
-          onDismiss={_handleDismiss}
-          size="xs"
-          color="white"
-        >
-          <Box padding={3} top={true}>
-            <Text weight="bold">Type</Text>
-            <Box marginTop={4} role="list" display="flex" direction="column">
-              {typeList.map((value, index) => {
-                return (
-                  <Box
-                    key={value}
-                    alignItems="center"
-                    paddingY={1}
-                    display="flex"
-                    direction="row"
-                  >
-                    <RadioButton
-                      checked={article.filter === value}
-                      id={"type_" + value}
-                      name="type"
-                      onChange={() => article.setFilter(value)}
-                      value={value}
-                    />
-                    <Box flex="grow">
-                      <Label htmlFor={"type_" + value}>
-                        <Box paddingX={2}>
-                          <Text>{value}</Text>
-                        </Box>
-                      </Label>
-                    </Box>
-                  </Box>
-                );
-              })}
-            </Box>
-          </Box>
-        </Flyout>
-      )}
       <ToastContainer position="bottom-right" hideProgressBar />
     </Box>
   );
