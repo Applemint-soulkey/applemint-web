@@ -139,7 +139,7 @@ const AnalyzeModal = (data, toggle) => {
           <Heading size="xs">External Links</Heading>
           {data.extContents.map((value, index) => {
             return (
-              <Link href={value}>
+              <Link href={value} target="blank">
                 <Text key={index}>{value}</Text>
               </Link>
             );
