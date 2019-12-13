@@ -3,6 +3,7 @@
   "version": "0.5.5",
   "private": true,
   "dependencies": {
+    "dropbox": "^4.0.30",
     "firebase": "^7.4.0",
     "gestalt": "^0.110.0",
     "mobx": "^5.15.0",

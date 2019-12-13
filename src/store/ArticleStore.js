@@ -102,8 +102,7 @@ class ArticleStore {
       .limit(this.loadSize)
       .get()
       .then(snapshot => {
-        if (snapshot.docs.length < this.loadSize) this.hasMore = false;
-        else this.hasMore = true;
+        this.hasMore = !(snapshot.docs.length < this.loadSize);
         this.last = snapshot.docs[snapshot.docs.length - 1];
         snapshot.forEach(document => {
           let articleData = document.data();
@@ -116,14 +115,14 @@ class ArticleStore {
   };
 
   loadMore = () => {
-    if (this.collectionRef !== null) {
+    console.log(this.last);
+    if (this.collectionRef !== null && this.last !== undefined) {
       this.collectionRef
         .startAfter(this.last)
         .limit(this.loadSize)
         .get()
         .then(snapshot => {
-          if (snapshot.docs.length < this.loadSize) this.hasMore = false;
-          else this.hasMore = true;
+          this.hasMore = !(snapshot.docs.length < this.loadSize);
           this.last = snapshot.docs[snapshot.docs.length - 1];
           snapshot.forEach(document => {
             let articleData = document.data();
