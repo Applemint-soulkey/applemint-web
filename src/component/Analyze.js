@@ -87,6 +87,7 @@ const AnalyzeModal = (data, toggle) => {
           src={data.url}
         />
       </Mask>
+      <Text>{data.name}</Text>
     </Box>
   );
   return (
@@ -129,7 +130,10 @@ const AnalyzeModal = (data, toggle) => {
             >
               <Masonry
                 comp={renderMasonry}
-                items={data.midiContents.map(value => ({ url: value }))}
+                items={data.midiContents.map(value => ({
+                  url: value,
+                  name: value.slice(value.lastIndexOf("/") + 1)
+                }))}
                 minCols={2}
                 scrollContainer={() => scrollContainerRef.current}
               />
