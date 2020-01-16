@@ -90,6 +90,7 @@ const AnalyzeModal = (data, toggle) => {
       <Text>{data.name}</Text>
     </Box>
   );
+  console.log(data);
   return (
     <Modal
       accessibilityCloseLabel="close"
@@ -98,7 +99,7 @@ const AnalyzeModal = (data, toggle) => {
       onDismiss={toggle}
       size="lg"
     >
-      {data !== undefined ? (
+      {data !== undefined && data !== null ? (
         <Box padding={4} display="flex" direction="column">
           <Box marginBottom={3}>
             <Heading size="xs">Title</Heading>
@@ -151,7 +152,11 @@ const AnalyzeModal = (data, toggle) => {
         </Box>
       ) : (
         <Box key="spinner" margin={2}>
-          <Spinner show={true} accessibilityLabel="load-more" />
+          {data !== null ? (
+            <Spinner show={true} accessibilityLabel="load-more" />
+          ) : (
+            <Text>Analyzation is Fail..</Text>
+          )}
         </Box>
       )}
     </Modal>
