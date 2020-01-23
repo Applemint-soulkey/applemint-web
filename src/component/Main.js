@@ -248,8 +248,14 @@ const Main = observer(() => {
         </Box>
       )}
       {filterOpen && Filter(filterRef.current, _handleDismiss, article)}
-      {analyzeOpen && AnalyzeModal(analyzeResult, _toggleAnalyze)}
-
+      {/* {analyzeOpen && AnalyzeModal(analyzeResult, _toggleAnalyze)} */}
+      {analyzeOpen && (
+        <AnalyzeModal
+          data={analyzeResult}
+          toggle={_toggleAnalyze}
+          setter={setAnalyzeResult}
+        />
+      )}
       <ToastContainer position="bottom-right" hideProgressBar />
     </Box>
   );

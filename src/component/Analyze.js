@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import React, { createRef, useState } from "react";
 import {
   Modal,
   Text,
@@ -9,7 +9,8 @@ import {
   Link,
   Button,
   Masonry,
-  Mask
+  Mask,
+  TextField
 } from "gestalt";
 import "gestalt/dist/gestalt.css";
 import { toast } from "react-toastify";
@@ -74,7 +75,12 @@ const dapina = async data => {
   }
 };
 
-const AnalyzeModal = (data, toggle) => {
+const AnalyzeModal = props => {
+  let data = props.data;
+  let toggle = props.toggle;
+  let setter = props.setter;
+  const [editFlag, setEditFlag] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
   const scrollContainerRef = createRef();
   const renderMasonry = ({ data }) => (
     <Box>
@@ -91,6 +97,15 @@ const AnalyzeModal = (data, toggle) => {
     </Box>
   );
   console.log(data);
+
+  const _handleEditTitleChanged = ({ value }) => {
+    setEditTitle(value);
+    setter({
+      ...data,
+      title: value
+    });
+  };
+
   return (
     <Modal
       accessibilityCloseLabel="close"
@@ -102,10 +117,37 @@ const AnalyzeModal = (data, toggle) => {
       {data !== undefined && data !== null ? (
         <Box padding={4} display="flex" direction="column">
           <Box marginBottom={3}>
-            <Heading size="xs">Title</Heading>
-            <Text size="xl" weight="bold">
-              {data.title}
-            </Text>
+            <Box display="flex" direction="row">
+              <Heading size="xs">Title</Heading>
+              <Box marginStart={4}>
+                <Button
+                  size="sm"
+                  color="blue"
+                  text="Edit"
+                  onClick={() => {
+                    setEditTitle(data.title);
+                    setEditFlag(!editFlag);
+                  }}
+                />
+              </Box>
+              <Box marginStart={3} justifyContent="center" alignItems="center">
+                <Text>{"It's not applied to Cloud Storage."}</Text>
+              </Box>
+            </Box>
+            <Box margin={2}>
+              {editFlag ? (
+                <TextField
+                  id="editTitle"
+                  placeholder="Edit Title"
+                  value={editTitle}
+                  onChange={_handleEditTitleChanged}
+                />
+              ) : (
+                <Text size="xl" weight="bold">
+                  {data.title}
+                </Text>
+              )}
+            </Box>
           </Box>
           <Box marginBottom={3}>
             <Box display="flex" alignItems="center" direction="row">
