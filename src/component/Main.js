@@ -31,6 +31,14 @@ const Main = observer(() => {
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
   const [analyzeResult, setAnalyzeResult] = useState();
   const httpRegex = /(https?:[^\s]+)/;
+  const analyzableType = [
+    "battlepage",
+    "dogdrip",
+    "imgur",
+    "youtube",
+    "twitch",
+    "direct"
+  ];
 
   useEffect(() => {
     article.firstLoad();
@@ -178,6 +186,18 @@ const Main = observer(() => {
                           <Text>{value.url}</Text>
                         </Link>
                       </Box>
+                      {analyzableType.includes(value.type) ? (
+                        <Box margin={1}>
+                          <Button
+                            color="white"
+                            size="sm"
+                            text="Analyze"
+                            onClick={() => _toggleAnalyze(value.fb_id)}
+                          />
+                        </Box>
+                      ) : (
+                        <Box />
+                      )}
                       <Box margin={1}>
                         <Button
                           color="red"
@@ -219,14 +239,6 @@ const Main = observer(() => {
                           }}
                         />
                       </Box>
-                      <Box margin={1}>
-                        <Button
-                          color="white"
-                          size="sm"
-                          text="Analyze"
-                          onClick={() => _toggleAnalyze(value.fb_id)}
-                        />
-                      </Box>
                       {activeTabIndex === 0 ? (
                         <Box margin={1}>
                           <Button
@@ -248,7 +260,6 @@ const Main = observer(() => {
         </Box>
       )}
       {filterOpen && Filter(filterRef.current, _handleDismiss, article)}
-      {/* {analyzeOpen && AnalyzeModal(analyzeResult, _toggleAnalyze)} */}
       {analyzeOpen && (
         <AnalyzeModal
           data={analyzeResult}
