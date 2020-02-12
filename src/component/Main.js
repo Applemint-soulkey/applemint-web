@@ -248,7 +248,6 @@ const Main = observer(() => {
         </Box>
       )}
       {filterOpen && Filter(filterRef.current, _handleDismiss, article)}
-      {/* {analyzeOpen && AnalyzeModal(analyzeResult, _toggleAnalyze)} */}
       {analyzeOpen && (
         <AnalyzeModal
           data={analyzeResult}
