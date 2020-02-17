@@ -6,11 +6,11 @@ import {
   Box,
   Heading,
   Image,
-  Link,
   Button,
   Masonry,
   Mask,
-  TextField
+  TextField,
+  Tooltip
 } from "gestalt";
 import "gestalt/dist/gestalt.css";
 import { toast } from "react-toastify";
@@ -25,7 +25,7 @@ const replaceFileName = (path, targetName) => {
   return saveTitle + extension;
 };
 
-const dapina = async data => {
+const dapina = async (data, setSaveBtnEnabled) => {
   toast(({ closeToast }) => (
     <Box>
       <Box
@@ -44,6 +44,8 @@ const dapina = async data => {
       </Box>
     </Box>
   ));
+
+  setSaveBtnEnabled(false);
   const savePrefixPath = "/test/";
   var dbx = new Dropbox({ accessToken: process.env.REACT_APP_DROPBOX_TOKEN });
   if (data.midiContents.length === 1) {
@@ -81,6 +83,7 @@ const AnalyzeModal = props => {
   let setter = props.setter;
   const [editFlag, setEditFlag] = useState(false);
   const [editTitle, setEditTitle] = useState("");
+  const [saveBtnEnabled, setSaveBtnEnabled] = useState(true);
   const scrollContainerRef = createRef();
   const renderMasonry = ({ data }) => (
     <Box>
@@ -120,18 +123,17 @@ const AnalyzeModal = props => {
             <Box display="flex" direction="row">
               <Heading size="xs">Title</Heading>
               <Box marginStart={4}>
-                <Button
-                  size="sm"
-                  color="blue"
-                  text="Edit"
-                  onClick={() => {
-                    setEditTitle(data.title);
-                    setEditFlag(!editFlag);
-                  }}
-                />
-              </Box>
-              <Box marginStart={3} justifyContent="center" alignItems="center">
-                <Text>{"It's not applied to Cloud Storage."}</Text>
+                <Tooltip inline text="It's not applied to Cloud Storage.">
+                  <Button
+                    size="sm"
+                    color="blue"
+                    text="Edit"
+                    onClick={() => {
+                      setEditTitle(data.title);
+                      setEditFlag(!editFlag);
+                    }}
+                  />
+                </Tooltip>
               </Box>
             </Box>
             <Box margin={2}>
@@ -159,7 +161,8 @@ const AnalyzeModal = props => {
                   size="sm"
                   color="blue"
                   text="Save"
-                  onClick={() => dapina(data)}
+                  disabled={!saveBtnEnabled}
+                  onClick={() => dapina(data, setSaveBtnEnabled)}
                 />
               </Box>
               <Box marginStart={4}>{}</Box>
@@ -183,14 +186,14 @@ const AnalyzeModal = props => {
             </Box>
           </Box>
 
-          <Heading size="xs">External Links</Heading>
+          {/* <Heading size="xs">External Links</Heading>
           {data.extContents.map((value, index) => {
             return (
               <Link href={value} target="blank">
                 <Text key={index}>{value}</Text>
               </Link>
             );
-          })}
+          })} */}
         </Box>
       ) : (
         <Box key="spinner" margin={2}>
