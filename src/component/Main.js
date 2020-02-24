@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer, toast } from "react-toastify";
 import InfiniteScroll from "react-infinite-scroller";
 import AnalyzeModal from "./Analyze";
+import BookmarkModal from "./Bookmark";
 import Filter from "./Filter";
 import { observer } from "mobx-react-lite";
 import useStores from "../store/Common";
@@ -29,7 +30,10 @@ const Main = observer(() => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterRef] = useState(() => createRef());
   const [analyzeOpen, setAnalyzeOpen] = useState(false);
+  const [bookmarkOpen, setBookmarkOpen] = useState(false);
   const [analyzeResult, setAnalyzeResult] = useState();
+  const [bookmarkData, setBookmarkData] = useState();
+  const [raindropCollection, setraindropCollection] = useState();
   const httpRegex = /(https?:[^\s]+)/;
   const analyzableType = [
     "battlepage",
@@ -42,7 +46,21 @@ const Main = observer(() => {
 
   useEffect(() => {
     article.firstLoad();
+    var raindropCall = firebase
+      .functions()
+      .httpsCallable("getRaindropCollections");
+
+    raindropCall().then(result => {
+      setraindropCollection(result.data);
+    });
   }, []);
+
+  const _toggleBookmark = async value => {
+    if (value !== null) {
+      setBookmarkData(value);
+    }
+    setBookmarkOpen(!bookmarkOpen);
+  };
 
   const _toggleAnalyze = async fb_id => {
     if (analyzeOpen === false) {
@@ -140,7 +158,11 @@ const Main = observer(() => {
           alignItems="center"
           justifyContent="center"
         >
-          <Heading>No Contents</Heading>
+          {article.isLoading ? (
+            <Spinner show={true} accessibilityLabel="isLoading" />
+          ) : (
+            <Heading>No Contents</Heading>
+          )}
         </Box>
       ) : (
         <Box padding={3} display="flex" direction="column">
@@ -185,6 +207,14 @@ const Main = observer(() => {
                           </Heading>
                           <Text>{value.url}</Text>
                         </Link>
+                      </Box>
+                      <Box margin={1}>
+                        <Button
+                          color="white"
+                          size="sm"
+                          text="Bookmark"
+                          onClick={() => _toggleBookmark(value)}
+                        />
                       </Box>
                       {analyzableType.includes(value.type) ? (
                         <Box margin={1}>
@@ -265,6 +295,13 @@ const Main = observer(() => {
           data={analyzeResult}
           toggle={_toggleAnalyze}
           setter={setAnalyzeResult}
+        />
+      )}
+      {bookmarkOpen && (
+        <BookmarkModal
+          data={bookmarkData}
+          toggle={_toggleBookmark}
+          collections={raindropCollection}
         />
       )}
       <ToastContainer position="bottom-right" hideProgressBar />
