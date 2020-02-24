@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   Box,
@@ -28,13 +28,11 @@ const BookmarkModal = props => {
   const [tags, setTags] = useState([]);
   const [waitForResponse, setWaitForResponse] = useState(false);
 
-  useEffect(() => {
-    collections.map((value, index) => {
-      if (value.label === data.type) {
-        setCollection(value.value.toString());
-      }
-    });
-  }, []);
+  for (let collection in collections) {
+    if (data !== undefined && collection.label === data.type) {
+      setCollection(collection.value.toString());
+    }
+  }
 
   const _handleKeydown = target => {
     if (target.event.key === "Enter") {

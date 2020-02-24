@@ -53,7 +53,7 @@ const Main = observer(() => {
     raindropCall().then(result => {
       setraindropCollection(result.data);
     });
-  }, []);
+  }, [article]);
 
   const _toggleBookmark = async value => {
     if (value !== null) {
