@@ -11,6 +11,7 @@ class ArticleStore {
   hasMore = false;
   collectionRef = null;
   totalSize = 0;
+  isLoading = false;
 
   restoreArticle = article => {
     let insertFbId = article.fb_id;
@@ -71,12 +72,14 @@ class ArticleStore {
   setState = value => {
     this.state = value;
     this.articles = [];
+    this.isLoading = true;
     this.firstLoad();
   };
 
   setFilter = value => {
     this.filter = value;
     this.articles = [];
+    this.isLoading = true;
     this.firstLoad();
   };
 
@@ -104,6 +107,7 @@ class ArticleStore {
       .then(snapshot => {
         this.hasMore = !(snapshot.docs.length < this.loadSize);
         this.last = snapshot.docs[snapshot.docs.length - 1];
+        this.isLoading = false;
         snapshot.forEach(document => {
           let articleData = document.data();
           this.articles.push({
@@ -139,6 +143,7 @@ class ArticleStore {
     this.articles = [];
     this.last = null;
     this.collectionRef = null;
+    this.isLoading = true;
     this.firstLoad();
   };
 }
@@ -149,6 +154,7 @@ decorate(ArticleStore, {
   articles: observable,
   hasMore: observable,
   totalSize: observable,
+  isLoading: observable,
   resetArticles: action,
   setFilter: action,
   setState: action,
