@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Box,
@@ -28,11 +28,16 @@ const BookmarkModal = props => {
   const [tags, setTags] = useState([]);
   const [waitForResponse, setWaitForResponse] = useState(false);
 
-  for (let collection in collections) {
-    if (data !== undefined && collection.label === data.type) {
-      setCollection(collection.value.toString());
+  useEffect(() => {
+    for (let collection of collections) {
+      if (data !== undefined && collection.label === data.type) {
+        setCollection(collection.value);
+      }
     }
-  }
+    return () => {
+      console.log("msg:: cleanup bookmark dialog");
+    };
+  }, [collections, data]);
 
   const _handleKeydown = target => {
     if (target.event.key === "Enter") {
